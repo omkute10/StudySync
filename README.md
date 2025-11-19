@@ -1,73 +1,177 @@
-# Welcome to your Lovable project
+📚 Learnix
+Never Study Alone Again.
 
-## Project info
+Learnix is a comprehensive academic collaboration platform designed to connect students with AI-matched tutors, study buddies, and campus partners. It leverages the power of modern web technologies, local AI models for content summarization, and Generative AI for personalized assistance.
 
-**URL**: https://lovable.dev/projects/f0cbb9b1-ee2d-4e09-a2e9-c17307df681c
+🚀 Features
+🤖 AI-Powered Tools
+PDF Summarizer: Upload study materials (PDFs) to get concise summaries and automatically detect key topics/interests using a backend-hosted Hugging Face model (facebook/bart-large-cnn).
 
-## How can I edit this code?
+Gemini AI Chat: An integrated chatbot powered by Google's Gemini API to answer academic questions and assist with study plans.
 
-There are several ways of editing your application.
+Tutor Matcher: AI analysis to calculate compatibility scores between students and tutors based on their profiles.
 
-**Use Lovable**
+👥 Connectivity
+Find Tutors: Browse expert tutors with filters for subject, rating, and availability.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/f0cbb9b1-ee2d-4e09-a2e9-c17307df681c) and start prompting.
+Find Study Buddies: Connect with peers who share similar academic interests and study styles.
 
-Changes made via Lovable will be committed automatically to this repo.
+Campus Partners: Find partners for extracurricular activities like sports or clubs.
 
-**Use your preferred IDE**
+🔐 User Experience
+Secure Authentication: Robust signup and login system powered by Firebase Authentication.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Multi-step Onboarding: A personalized signup flow to capture user demographics, roles (Student/Tutor), and academic interests.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Dashboard: A central hub managing upcoming schedules, messages, and quick actions.
 
-Follow these steps:
+Responsive Design: Fully responsive UI built with Tailwind CSS and a mobile-first approach.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+🛠️ Tech Stack
+Frontend
+Framework: React (via Vite)
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Language: TypeScript
 
-# Step 3: Install the necessary dependencies.
-npm i
+Styling: Tailwind CSS
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+UI Components: Shadcn UI (based on Radix UI)
+
+Icons: Lucide React
+
+State/Data Fetching: TanStack Query
+
+Routing: React Router DOM
+
+AI Integration: Google Generative AI SDK
+
+Backend
+Framework: FastAPI
+
+Language: Python
+
+PDF Processing: PyPDF2
+
+ML/NLP: transformers (Hugging Face), torch
+
+Services & Infrastructure
+Authentication & Database: Firebase (Auth & Firestore)
+
+LLM Provider: Google Gemini API (Frontend), Hugging Face (Backend local inference)
+
+📂 Project Structure
+Plaintext
+
+Learnix/
+├── backend/                 # Python FastAPI Backend
+│   ├── main.py              # API Endpoints (PDF upload, Topic detection)
+│   ├── model.py             # ML Model logic (BART Summarization)
+│   └── requirements.txt     # Python dependencies
+├── src/                     # React Frontend
+│   ├── components/          # Reusable UI components & Sections
+│   │   ├── ui/              # Shadcn UI primitives
+│   │   ├── GeminiChat.tsx   # AI Chat component
+│   │   └── ...
+│   ├── contexts/            # React Contexts (Auth, Signup state)
+│   ├── hooks/               # Custom hooks (useGemini, useToast)
+│   ├── lib/                 # Utility functions & Config (Firebase, Gemini)
+│   ├── pages/               # Application Routes/Pages
+│   │   ├── signup/          # Multi-step signup pages
+│   │   ├── Dashboard.tsx    # Main user dashboard
+│   │   └── ...
+│   ├── App.tsx              # Main App component & Routing
+│   └── main.tsx             # Entry point
+├── .env.example             # Environment variable template
+├── index.html               # HTML entry point
+├── package.json             # Node dependencies
+├── tailwind.config.ts       # Tailwind configuration
+└── vite.config.ts           # Vite configuration
+⚡ Getting Started
+Prerequisites
+Node.js (v18 or higher)
+
+Python (v3.10 or higher)
+
+Google Gemini API Key
+
+Firebase Project (Configured with Auth and Firestore)
+
+1. Clone the Repository
+Bash
+
+git clone https://github.com/yourusername/Learnix.git
+cd Learnix
+2. Backend Setup
+The backend handles PDF parsing and heavy ML summarization tasks.
+
+Bash
+
+cd backend
+
+# Create a virtual environment (optional but recommended)
+python -m venv venv
+# Activate: source venv/bin/activate (Linux/Mac) or venv\Scripts\activate (Windows)
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Start the server
+python main.py
+# OR using uvicorn directly: uvicorn main:app --reload
+The backend will run on http://0.0.0.0:8000
+
+3. Frontend Setup
+Open a new terminal window for the frontend.
+
+Bash
+
+# Return to root directory if you are in backend/
+cd ..
+
+# Install Node dependencies
+npm install
+
+# Setup Environment Variables
+# Create a .env file in the root directory based on .env.example
+cp .env.example .env
+Update .env with your keys:
+
+Code snippet
+
+VITE_GEMINI_API_KEY=your_google_gemini_api_key_here
+Note: Firebase configuration is currently located in src/lib/firebase.ts. Ensure your Firebase project settings match the config object there.
+
+Bash
+
+# Run the development server
 npm run dev
-```
+The frontend will run on http://localhost:8080 (or similar port shown in terminal).
 
-**Edit a file directly in GitHub**
+🖥️ Usage Guide
+Sign Up: Create an account using the multi-step wizard. Choose your role (Student/Tutor) and select your academic interests.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Dashboard:
 
-**Use GitHub Codespaces**
+Upload PDF: Use the "Upload PDF" card to upload a syllabus or study notes. The Python backend will process it, providing a summary and detecting relevant topics.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+AI Chat: Click "AI Chat" in the navbar to talk to the Gemini-powered assistant.
 
-## What technologies are used for this project?
+Schedule: View your upcoming study sessions.
 
-This project is built with .
+Search: Use the search bar or quick action cards to find Tutors, Study Buddies, or Campus Partners using the filterable lists.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+🤝 Contributing
+Contributions are welcome! Please follow these steps:
 
-## How can I deploy this project?
+Fork the repository.
 
-Simply open [Lovable](https://lovable.dev/projects/f0cbb9b1-ee2d-4e09-a2e9-c17307df681c) and click on Share -> Publish.
+Create a new branch (git checkout -b feature/AmazingFeature).
 
-## Can I connect a custom domain to my Lovable project?
+Commit your changes (git commit -m 'Add some AmazingFeature').
 
-Yes it is!
+Push to the branch (git push origin feature/AmazingFeature).
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Open a Pull Request.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+📄 License
+Distributed under the MIT License.
