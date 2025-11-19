@@ -4,7 +4,18 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useGemini } from "@/hooks/useGemini";
 import { Send, Loader2 } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
+// Function to clean and format text
+const formatText = (text: string): string => {
+  // Remove markdown bold/italic markers
+  let formatted = text
+    .replace(/\*\*(.*?)\*\*/g, "$1") // Remove **bold**
+    .replace(/\*(.*?)\*/g, "$1") // Remove *italic*
+    .replace(/__(.*?)__/g, "$1") // Remove __bold__
+    .replace(/_(.*?)_/g, "$1"); // Remove _italic_
+  
+  return formatted;
+};
 
 interface Message {
   id: string;
@@ -30,7 +41,9 @@ export const GeminiChat = () => {
   useEffect(() => {
     // Auto-scroll to bottom when new messages arrive
     if (scrollRef.current) {
-      scrollRef.current.scrollIntoView({ behavior: "smooth" });
+      setTimeout(() => {
+        scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 0);
     }
   }, [messages]);
 
@@ -59,7 +72,7 @@ export const GeminiChat = () => {
       
       const geminiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: response,
+        text: formatText(response),
         sender: "gemini",
         timestamp: new Date(),
       };
@@ -102,55 +115,53 @@ export const GeminiChat = () => {
       <CardHeader className="border-b">
         <CardTitle>Gemini AI Study Assistant</CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 flex flex-col p-0">
+      <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
         {/* Messages Area */}
-        <ScrollArea className="flex-1 p-4">
-          <div className="space-y-4">
-            {messages.map((message) => (
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={`flex ${
+                message.sender === "user" ? "justify-end" : "justify-start"
+              }`}
+            >
               <div
-                key={message.id}
-                className={`flex ${
-                  message.sender === "user" ? "justify-end" : "justify-start"
+                className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                  message.sender === "user"
+                    ? "bg-primary text-primary-foreground rounded-br-none"
+                    : "bg-gray-200 text-gray-900 rounded-bl-none"
                 }`}
               >
-                <div
-                  className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                <p className="text-sm whitespace-pre-wrap break-words leading-relaxed">
+                  {message.text}
+                </p>
+                <p
+                  className={`text-xs mt-1 ${
                     message.sender === "user"
-                      ? "bg-primary text-primary-foreground rounded-br-none"
-                      : "bg-gray-200 text-gray-900 rounded-bl-none"
+                      ? "text-primary-foreground/70"
+                      : "text-gray-600"
                   }`}
                 >
-                  <p className="text-sm whitespace-pre-wrap break-words">
-                    {message.text}
-                  </p>
-                  <p
-                    className={`text-xs mt-1 ${
-                      message.sender === "user"
-                        ? "text-primary-foreground/70"
-                        : "text-gray-600"
-                    }`}
-                  >
-                    {message.timestamp.toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </p>
+                  {message.timestamp.toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </p>
+              </div>
+            </div>
+          ))}
+          {isGenerating && (
+            <div className="flex justify-start">
+              <div className="bg-gray-200 text-gray-900 px-4 py-2 rounded-lg rounded-bl-none">
+                <div className="flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span className="text-sm">Thinking...</span>
                 </div>
               </div>
-            ))}
-            {isGenerating && (
-              <div className="flex justify-start">
-                <div className="bg-gray-200 text-gray-900 px-4 py-2 rounded-lg rounded-bl-none">
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span className="text-sm">Thinking...</span>
-                  </div>
-                </div>
-              </div>
-            )}
-            <div ref={scrollRef} />
-          </div>
-        </ScrollArea>
+            </div>
+          )}
+          <div ref={scrollRef} />
+        </div>
 
         {/* Input Area */}
         <div className="border-t p-4 space-y-3">

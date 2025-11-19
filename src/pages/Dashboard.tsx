@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useSignup } from "@/contexts/SignupContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { GeminiChat } from "@/components/GeminiChat";
@@ -28,15 +29,47 @@ const Dashboard = () => {
   const [selectedUser, setSelectedUser] = useState<{id: number, name: string, image: string} | null>(null);
   const [showMessageBox, setShowMessageBox] = useState(false);
   
-  // In a real app, this would come from authentication state
-  const isStudent = true;
-  
+  // Dashboard selection persisted per-user (null = not chosen yet)
+  const [dashboardChoice, setDashboardChoice] = useState<string | null>(null);
+  const { currentUser } = useAuth();
+
+  // Determine role from selection (if chosen) or signup context
+  const isTutor = dashboardChoice ? dashboardChoice === 'tutor' : role === "Tutor";
+
   useEffect(() => {
     // Set the user's name from the signup context
     if (name) {
       setUserName(name);
     }
-  }, [name]);
+
+    // If a user is logged in, try to load their persisted dashboard choice
+    try {
+      if (currentUser && currentUser.uid) {
+        const key = `dashboardChoice:${currentUser.uid}`;
+        const stored = localStorage.getItem(key);
+        if (stored === 'student' || stored === 'tutor') {
+          setDashboardChoice(stored);
+          return;
+        }
+      }
+    } catch (e) {
+      // ignore localStorage errors
+    }
+
+    // No persisted choice for this session/user -> reset to null so role controls default
+    setDashboardChoice(null);
+  }, [name, currentUser?.uid]);
+
+  const handleSelectDashboard = (choice: 'student' | 'tutor') => {
+    setDashboardChoice(choice);
+    try {
+      if (currentUser && currentUser.uid) {
+        const key = `dashboardChoice:${currentUser.uid}`;
+        localStorage.setItem(key, choice);
+      }
+    } catch (e) {}
+    toast({ title: 'Dashboard selected', description: `Showing the ${choice === 'tutor' ? 'Tutor' : 'Student'} dashboard.` });
+  };
   
   const handleLogout = () => {
     toast({
@@ -140,13 +173,24 @@ const Dashboard = () => {
     setShowMessageBox(false);
   };
 
-  // Mock calendar events
-  const calendarEvents = [
+  // Calendar events (now stateful so we can add events)
+  const [calendarEvents, setCalendarEvents] = useState([
     { id: 1, title: "Study Session with Aneesh", date: "2023-06-15", time: "10:00 AM - 11:30 AM" },
     { id: 2, title: "Tutoring Session - Python", date: "2023-06-16", time: "2:00 PM - 3:00 PM" },
     { id: 3, title: "Campus Partner Meetup", date: "2023-06-18", time: "5:00 PM - 6:00 PM" },
     { id: 4, title: "Group Study - Data Science", date: "2023-06-20", time: "1:00 PM - 3:00 PM" },
-  ];
+  ]);
+
+  const addCalendarEvent = (title: string, date: string, time: string) => {
+    setCalendarEvents((prev) => [
+      ...prev,
+      { id: Date.now(), title, date, time },
+    ]);
+    setIsCalendarOpen(true);
+  };
+
+  // Profile image state (local preview only)
+  const [profileImage, setProfileImage] = useState<string | null>(null);
 
   // Mock users for messaging
   const mockUsers = [
@@ -323,8 +367,21 @@ const Dashboard = () => {
                 <div className="py-4">
                   <div className="space-y-4">
                     <div className="flex items-center justify-center mb-6">
-                      <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-primary/20 flex items-center justify-center">
-                        <User className="w-10 h-10 sm:w-12 sm:h-12 text-primary" />
+                      <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-primary/20 flex items-center justify-center cursor-pointer overflow-hidden">
+                        {profileImage ? (
+                          <img src={profileImage} alt="profile" className="w-full h-full object-cover" onClick={() => document.getElementById('profile-upload')?.click()} />
+                        ) : (
+                          <div onClick={() => document.getElementById('profile-upload')?.click()} className="w-full h-full flex items-center justify-center">
+                            <User className="w-10 h-10 sm:w-12 sm:h-12 text-primary" />
+                          </div>
+                        )}
+                        <input id="profile-upload" type="file" accept="image/*" className="hidden" onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const url = URL.createObjectURL(file);
+                            setProfileImage(url);
+                          }
+                        }} />
                       </div>
                     </div>
                     
@@ -371,6 +428,31 @@ const Dashboard = () => {
                           ) : (
                             <p className="text-gray-500">No interests specified</p>
                           )}
+                        </div>
+                      </div>
+                      <div className="col-span-1 sm:col-span-2">
+                        <h4 className="text-sm font-medium">Add Calendar Event</h4>
+                        <div className="mt-2 space-y-2">
+                          <input id="event-title" placeholder="Event title" className="w-full px-3 py-2 border rounded" />
+                          <input id="event-date" type="date" className="w-full px-3 py-2 border rounded" />
+                          <input id="event-time" type="text" placeholder="Time (e.g. 2:00 PM - 3:00 PM)" className="w-full px-3 py-2 border rounded" />
+                          <div className="flex justify-end">
+                            <Button onClick={() => {
+                              const titleEl = document.getElementById('event-title') as HTMLInputElement | null;
+                              const dateEl = document.getElementById('event-date') as HTMLInputElement | null;
+                              const timeEl = document.getElementById('event-time') as HTMLInputElement | null;
+                              if (titleEl && dateEl && timeEl && titleEl.value && dateEl.value && timeEl.value) {
+                                addCalendarEvent(titleEl.value, dateEl.value, timeEl.value);
+                                titleEl.value = '';
+                                dateEl.value = '';
+                                timeEl.value = '';
+                                setIsProfileOpen(false);
+                                toast({ title: 'Event added', description: 'Your event was added to the schedule.' });
+                              } else {
+                                toast({ title: 'Missing fields', description: 'Please fill title, date and time.', variant: 'destructive' });
+                              }
+                            }}>Add Event</Button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -424,83 +506,177 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BookOpen className="h-5 w-5 text-primary" />
-                Find a Tutor
-              </CardTitle>
-              <CardDescription>
-                Connect with expert tutors in your subjects.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600 mb-4">
-                Get personalized help from qualified tutors who can guide you through difficult concepts.
-              </p>
-            </CardContent>
-            <CardFooter>
-              <Button 
-                className="w-full"
-                onClick={() => navigate('/search-tutors')}
-              >
-                Find Tutors
-              </Button>
-            </CardFooter>
-          </Card>
+        {/* Quick Actions - choose dashboard first, then show tutor/student options */}
+        {!dashboardChoice ? (
+          <div className="mb-12">
+            <Card className="max-w-2xl mx-auto hover:shadow-lg">
+              <CardHeader>
+                <CardTitle>Choose Your Dashboard</CardTitle>
+                <CardDescription>
+                  Select which experience you'd like to use right now. You can change this later in your Profile.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-gray-600">Which dashboard would you like to view?</p>
+              </CardContent>
+              <CardFooter>
+                <div className="flex gap-3 w-full">
+                  <Button className="w-1/2" onClick={() => handleSelectDashboard('student')}>Student Dashboard</Button>
+                  <Button className="w-1/2" onClick={() => handleSelectDashboard('tutor')}>Tutor Dashboard</Button>
+                </div>
+              </CardFooter>
+            </Card>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          {isTutor ? (
+            <>
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-5 w-5 text-primary" />
+                    Manage Bookings
+                  </CardTitle>
+                  <CardDescription>
+                    View and manage your upcoming tutoring sessions.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Confirm or cancel sessions, and review student requests.
+                  </p>
+                </CardContent>
+                <CardFooter>
+                  <Button className="w-full" onClick={() => navigate('/tutor/bookings')}>
+                    View Bookings
+                  </Button>
+                </CardFooter>
+              </Card>
 
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-primary" />
-                Find a Study Buddy
-              </CardTitle>
-              <CardDescription>
-                Connect with peers for collaborative learning.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600 mb-4">
-                Find study partners who share your academic interests and learning style.
-              </p>
-            </CardContent>
-            <CardFooter>
-              <Button 
-                className="w-full"
-                onClick={() => navigate('/search-buddies')}
-              >
-                Match Now
-              </Button>
-            </CardFooter>
-          </Card>
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-primary" />
+                    Create Course
+                  </CardTitle>
+                  <CardDescription>
+                    Publish a course or listing so students can book you.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Add course details, pricing, and availability to attract students.
+                  </p>
+                </CardContent>
+                <CardFooter>
+                  <Button className="w-full" onClick={() => navigate('/tutor/create-course')}>
+                    Create Course
+                  </Button>
+                </CardFooter>
+              </Card>
 
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-primary" />
-                Find a Campus Partner
-              </CardTitle>
-              <CardDescription>
-                Connect for activities and events.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600 mb-4">
-                Find partners for campus activities, sports, and social events.
-              </p>
-            </CardContent>
-            <CardFooter>
-              <Button 
-                className="w-full"
-                onClick={() => navigate('/search-partners')}
-              >
-                Find Partners
-              </Button>
-            </CardFooter>
-          </Card>
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Calendar className="h-5 w-5 text-primary" />
+                    Set Availability
+                  </CardTitle>
+                  <CardDescription>
+                    Configure times when students can book sessions with you.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Sync with your calendar and manage open slots.
+                  </p>
+                </CardContent>
+                <CardFooter>
+                  <Button className="w-full" onClick={() => setIsCalendarOpen(true)}>
+                    Manage Calendar
+                  </Button>
+                </CardFooter>
+              </Card>
+            </>
+          ) : (
+            <>
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BookOpen className="h-5 w-5 text-primary" />
+                    Find a Tutor
+                  </CardTitle>
+                  <CardDescription>
+                    Connect with expert tutors in your subjects.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Get personalized help from qualified tutors who can guide you through difficult concepts.
+                  </p>
+                </CardContent>
+                <CardFooter>
+                  <Button 
+                    className="w-full"
+                    onClick={() => navigate('/search-tutors')}
+                  >
+                    Find Tutors
+                  </Button>
+                </CardFooter>
+              </Card>
+
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-5 w-5 text-primary" />
+                    Find a Study Buddy
+                  </CardTitle>
+                  <CardDescription>
+                    Connect with peers for collaborative learning.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Find study partners who share your academic interests and learning style.
+                  </p>
+                </CardContent>
+                <CardFooter>
+                  <Button 
+                    className="w-full"
+                    onClick={() => navigate('/search-buddies')}
+                  >
+                    Match Now
+                  </Button>
+                </CardFooter>
+              </Card>
+
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-5 w-5 text-primary" />
+                    Find a Campus Partner
+                  </CardTitle>
+                  <CardDescription>
+                    Connect for activities and events.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Find partners for campus activities, sports, and social events.
+                  </p>
+                </CardContent>
+                <CardFooter>
+                  <Button 
+                    className="w-full"
+                    onClick={() => navigate('/search-partners')}
+                  >
+                    Find Partners
+                  </Button>
+                </CardFooter>
+              </Card>
+            </>
+          )}
         </div>
+        )}
 
         {/* Recent Activity */}
         <div className="mb-12">

@@ -13,6 +13,8 @@ import Login from "./pages/Login";
 import SearchTutors from "./pages/SearchTutors";
 import SearchBuddies from "./pages/SearchBuddies";
 import SearchPartners from "./pages/SearchPartners";
+import Bookings from "./pages/tutor/Bookings";
+import CreateCourse from "./pages/tutor/CreateCourse";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +34,8 @@ const App = () => (
           <Route path="/search-tutors" element={<SearchTutors />} />
           <Route path="/search-buddies" element={<SearchBuddies />} />
           <Route path="/search-partners" element={<SearchPartners />} />
+          <Route path="/tutor/bookings" element={<Bookings />} />
+          <Route path="/tutor/create-course" element={<CreateCourse />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
