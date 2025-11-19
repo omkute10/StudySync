@@ -59,7 +59,10 @@ const Dashboard = () => {
         toast({
           title: "PDF Uploaded",
           description: "Processing with AI to extract content and interests...",
+          
         });
+          let sum= document.getElementById("sum-content");
+          sum.innerHTML = "<b>Processing....</b>"
         
         try {
           const formData = new FormData();
@@ -73,12 +76,11 @@ const Dashboard = () => {
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
-          let sum= document.getElementById("sum-content");
-          sum.innerHTML = "Processing...."
+
           const result = await response.json();
           
           
-          sum.innerHTML=`<b>Summary</b>: ${result.summary.substring(0, 2000)}${result.summary.length > 2000 ? '...' : ''}`;
+          sum.innerHTML=`<b>Summary</b>: ${result.summary.substring(0, 4000)}${result.summary.length > 4000 ? '...' : ''}`;
           
           if (result.topics && result.topics.length > 0) {
             toast({
@@ -568,7 +570,7 @@ const Dashboard = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-600 mb-4" id="sum-content">
+              <p className="text-sm text-gray-600 mb-4">
                 Our AI will analyze your study materials and provide personalized recommendations.
               </p>
             </CardContent>
@@ -581,6 +583,25 @@ const Dashboard = () => {
               </Button>
             </CardFooter>
           </Card>
+
+
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Upload className="h-5 w-5 text-primary" />
+                Summary
+              </CardTitle>
+              <CardDescription>
+                Upload a PDF above to view summary
+                
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-600 mb-4" id="sum-content">
+                
+              </p>
+            </CardContent>
+            </Card>
         </div>
       </main>
     </div>

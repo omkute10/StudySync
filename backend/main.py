@@ -46,11 +46,11 @@ def generate_summary(prompt: str) -> dict:
     try:
         model = pipeline(task="summarization", model="facebook/bart-large-cnn")
         # Truncate text if too long for the model (BART has max input length)
-        max_input_length = 3000
+        max_input_length = 4000
         if len(prompt) > max_input_length:
             prompt = prompt[:max_input_length]
         
-        summary = model(prompt, max_length=130, min_length=30, do_sample=False)
+        summary = model(prompt, max_length=4000, min_length=30, do_sample=False)
         return {"summary_text": summary[0]['summary_text']}
     except Exception as e:
         # Fallback to simple summary if model fails
