@@ -6,7 +6,7 @@ import re
 from typing import List
 from transformers import pipeline
 
-app = FastAPI(title="StudySync PDF Processor", version="1.0.0")
+app = FastAPI(title="Learnix PDF Processor", version="1.0.0")
 
 # Add CORS middleware to allow frontend connections
 app.add_middleware(
@@ -85,7 +85,7 @@ def detect_topics(text: str) -> List[str]:
 
 @app.get("/")
 async def root():
-    return {"message": "StudySync PDF Processor API", "status": "running"}
+    return {"message": "Learnix PDF Processor API", "status": "running"}
 
 @app.post("/upload-pdf")
 async def upload_pdf(file: UploadFile = File(...)):

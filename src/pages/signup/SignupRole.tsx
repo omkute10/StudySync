@@ -66,7 +66,7 @@ const SignupRole = () => {
 
       toast({
         title: "Signup complete!",
-        description: "Welcome to StudySync! You're all set.",
+        description: "Welcome to Learnix! You're all set.",
       });
       
       // Navigate to dashboard
@@ -88,7 +88,7 @@ const SignupRole = () => {
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-white to-accent-light/20 p-4">
       <div className="w-full max-w-3xl">
         <h1 className="text-3xl font-bold text-center mb-2">Choose Your Role</h1>
-        <p className="text-gray-600 text-center mb-8">Step 3 of 3: How will you use StudySync?</p>
+        <p className="text-gray-600 text-center mb-8">Step 3 of 3: How will you use Learnix?</p>
         
         <GlassCard className="max-w-3xl">
           <div className="space-y-6">

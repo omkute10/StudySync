@@ -9,16 +9,22 @@ interface Testimonial {
 
 const testimonials: Testimonial[] = [
   {
-    quote: "I aced my finals thanks to StudySync!",
+    quote: "I aced my finals thanks to Learnix!",
     name: "Aneesh Puranik",
-    affiliation: "MIT '25",
-    avatar: "https://i.pravatar.cc/100?img=1"
+    affiliation: "Zeal'27",
+    avatar: "https://avatars.githubusercontent.com/u/130128563?v=4"
   },
   {
     quote: "Met my startup co-founder here!",
     name: "Aryan Tambe",
-    affiliation: "Stanford '26",
-    avatar: "https://i.pravatar.cc/100?img=3"
+    affiliation: "Zeal'27",
+    avatar: "https://media.licdn.com/dms/image/v2/D4D03AQH0N2msqS0x_Q/profile-displayphoto-shrink_200_200/B4DZPdNABOHYAY-/0/1734582994063?e=1765411200&v=beta&t=HOeNn1kB6JtATOMVNynkRCqenAsakFXScf-1UvnlzDE"
+  },
+  {
+    quote: "Learned GenAI here!",
+    name: "Om Kute",
+    affiliation: "Zeal'27",
+    avatar: "https://avatars.githubusercontent.com/u/130128563?v=4"
   }
 ];
 
@@ -47,7 +53,7 @@ const TestimonialsSection = () => {
   }, []);
 
   return (
-    <section id="about" className="section-padding" ref={sectionRef}>
+    <section id="testimonials" className="section-padding" ref={sectionRef}>
       <div className="container mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
           What Our Users Say

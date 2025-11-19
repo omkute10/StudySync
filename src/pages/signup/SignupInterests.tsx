@@ -29,7 +29,7 @@ const SignupInterests = () => {
 
     toast({
       title: "Interests saved!",
-      description: "Now let's select your role on StudySync",
+      description: "Now let's select your role on Learnix",
     });
     
     navigate("/signup/role");

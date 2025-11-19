@@ -214,7 +214,7 @@ const Dashboard = () => {
       <nav className="glass fixed-navbar px-4 py-3">
         <div className="container mx-auto flex justify-between items-center">
           <div className="flex items-center">
-            <span className="text-xl font-bold gradient-text">StudySync</span>
+            <span className="text-xl font-bold gradient-text">Learnix</span>
           </div>
           
           <div className="hidden md:flex items-center space-x-6">

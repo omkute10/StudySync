@@ -62,21 +62,21 @@ const ContactSection = () => {
         
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           <div>
-            <h3 className="text-xl font-semibold mb-4">StudySync Mentors</h3>
+            <h3 className="text-xl font-semibold mb-4">Learnix Mentors</h3>
             <div className="space-y-4">
               <MentorCard 
                 name="Dr. Sarah Johnson"
-                email="sarah@studysync.com"
+                email="sarah@Learnix.com"
                 delay={100}
               />
               <MentorCard 
                 name="Prof. Michael Chen"
-                email="michael@studysync.com"
+                email="michael@Learnix.com"
                 delay={200}
               />
               <MentorCard 
                 name="Lisa Blackwell, PhD"
-                email="lisa@studysync.com"
+                email="lisa@Learnix.com"
                 delay={300}
               />
             </div>

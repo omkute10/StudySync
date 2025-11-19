@@ -59,7 +59,7 @@ const Index = () => {
     }
 
     // Easter egg for hackathon judges
-    console.log("🏆 Built for Hackathon Challenge by Team StudySync");
+    console.log("🏆 Built for Hackathon Challenge by Team Learnix");
 
     // Clean up event listeners
     return () => {
@@ -99,7 +99,6 @@ const Index = () => {
         <AboutSection />
         <FeaturesSection />
         <TestimonialsSection />
-        <ContactSection />
       </main>
       <Footer />
     </div>

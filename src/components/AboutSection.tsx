@@ -37,10 +37,10 @@ const AboutSection = () => {
       <div className="container mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            About StudySync
+            About Learnix
           </h2>
           <p className="text-gray-600 max-w-3xl mx-auto">
-            StudySync is a revolutionary platform designed to transform the way students learn, connect, and succeed in their academic journey.
+            Learnix is a revolutionary platform designed to transform the way students learn, connect, and succeed in their academic journey.
           </p>
         </div>
 
@@ -48,18 +48,18 @@ const AboutSection = () => {
           <div className={`${isVisible ? 'opacity-100 transform translate-x-0' : 'opacity-0 transform -translate-x-10'} transition-all duration-700 ease-out`}>
             <h3 className="text-2xl font-bold mb-4">Our Mission</h3>
             <p className="text-gray-600 mb-4">
-              At StudySync, we believe that learning is a collaborative journey. Our mission is to empower students by connecting them with the right resources, tutors, and study partners to achieve their academic goals.
+              At Learnix, we believe that learning is a collaborative journey. Our mission is to empower students by connecting them with the right resources, tutors, and study partners to achieve their academic goals.
             </p>
             <p className="text-gray-600 mb-4">
-              Founded by a team of passionate educators and technologists, StudySync combines the power of AI with human connection to create a personalized learning experience for every student.
+              Founded by a team of passionate educators and technologists, Learnix combines the power of AI with human connection to create a personalized learning experience for every student.
             </p>
             <p className="text-gray-600">
-              Whether you're looking for a tutor to help with a challenging subject, a study buddy to keep you motivated, or a campus partner for extracurricular activities, StudySync is your one-stop platform for academic success.
+              Whether you're looking for a tutor to help with a challenging subject, a study buddy to keep you motivated, or a campus partner for extracurricular activities, Learnix is your one-stop platform for academic success.
             </p>
           </div>
           <div className={`${isVisible ? 'opacity-100 transform translate-x-0' : 'opacity-0 transform translate-x-10'} transition-all duration-700 ease-out`}>
             <img 
-              src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+              src="https://plus.unsplash.com/premium_photo-1681681082165-fd333bbc037a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8c3R1ZGVudHMlMjBzdHVkeWluZ3xlbnwwfHwwfHx8MA%3D%3D"
               alt="Students collaborating" 
               className="rounded-lg shadow-lg w-full h-auto"
             />

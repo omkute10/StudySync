@@ -69,7 +69,7 @@ const Login = () => {
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-white to-accent-light/20 p-4">
       <div className="w-full max-w-md">
         <h1 className="text-3xl font-bold text-center mb-2">Welcome Back!</h1>
-        <p className="text-gray-600 text-center mb-8">Log in to your StudySync account</p>
+        <p className="text-gray-600 text-center mb-8">Log in to your Learnix account</p>
         
         <GlassCard>
           <Form {...form}>

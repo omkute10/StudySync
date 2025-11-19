@@ -53,12 +53,12 @@ const Navbar = () => {
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="text-xl font-bold gradient-text">
-          StudySync
+          Learnix
         </Link>
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex space-x-6">
-          <Link to="/" className="nav-link">
+          <Link to="#" className="nav-link">
             Home
           </Link>
           <a href="#features" className="nav-link">
@@ -67,8 +67,8 @@ const Navbar = () => {
           <a href="#about" className="nav-link">
             About
           </a>
-          <a href="#contact" className="nav-link">
-            Contact
+          <a href="#testimonials" className="nav-link">
+            Testimonials
           </a>
         </div>
 
@@ -106,7 +106,7 @@ const Navbar = () => {
           }`}
         >
           <div className="flex justify-between items-center p-4 border-b">
-            <span className="text-xl font-bold gradient-text">StudySync</span>
+            <span className="text-xl font-bold gradient-text">Learnix</span>
             <button
               onClick={toggleMenu}
               className="text-gray-600 hover:text-primary focus:outline-none p-2"
