@@ -44,19 +44,57 @@ const Dashboard = () => {
     navigate("/");
   };
   
-  const handleUploadPDF = () => {
+  const handleUploadPDF = async () => {
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = '.pdf';
     fileInput.click();
     
-    fileInput.onchange = (e) => {
+    fileInput.onchange = async (e) => {
       const files = (e.target as HTMLInputElement).files;
       if (files && files.length > 0) {
+        const file = files[0];
         toast({
           title: "PDF Uploaded",
-          description: "Please wait for the ML model to start processing",
+          description: "Processing with AI to extract content and interests...",
         });
+        
+        try {
+          const formData = new FormData();
+          formData.append('file', file);
+          
+          const response = await fetch('http://localhost:8000/upload-pdf', {
+            method: 'POST',
+            body: formData,
+          });
+          
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          let sum= document.getElementById("sum-content");
+          sum.innerHTML = "Processing...."
+          const result = await response.json();
+          
+          
+          sum.innerHTML=`<b>Summary</b>: ${result.summary.substring(0, 2000)}${result.summary.length > 2000 ? '...' : ''}`;
+          
+          if (result.topics && result.topics.length > 0) {
+            toast({
+              title: "New Interests Detected",
+              description: `Found: ${result.topics.join(', ')}`,
+            });
+            // Note: In a real app, you would update the user's profile interests here
+            console.log('Detected topics to add to profile:', result.topics);
+          }
+          
+        } catch (error) {
+          console.error('Error uploading PDF:', error);
+          toast({
+            title: "Upload Failed",
+            description: "Failed to process PDF. Please ensure the backend is running.",
+            variant: "destructive",
+          });
+        }
       }
     };
   };
@@ -510,10 +548,11 @@ const Dashboard = () => {
               </CardTitle>
               <CardDescription>
                 Upload your study materials for AI-powered analysis.
+                
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-600 mb-4">
+              <p className="text-sm text-gray-600 mb-4" id="sum-content">
                 Our AI will analyze your study materials and provide personalized recommendations.
               </p>
             </CardContent>
