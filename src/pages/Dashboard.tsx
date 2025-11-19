@@ -19,6 +19,25 @@ const Dashboard = () => {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const { name, age, gender, degree, email, interests, role, studentType } = useSignup();
+  
+  // State to store detected topics for display
+  const [detectedTopics, setDetectedTopics] = useState<string[]>([]);
+  
+  // Function to check for new interests and store them
+  const processDetectedTopics = (newTopics: string[]) => {
+    if (newTopics.length > 0) {
+      const currentInterests = interests || [];
+      const uniqueNewTopics = newTopics.filter(topic => 
+        !currentInterests.some(interest => 
+          interest.toLowerCase() === topic.toLowerCase()
+        )
+      );
+      
+      setDetectedTopics(uniqueNewTopics);
+      return uniqueNewTopics;
+    }
+    return [];
+  };
   const [userName, setUserName] = useState("there");
   const [messageText, setMessageText] = useState("");
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
@@ -116,12 +135,24 @@ const Dashboard = () => {
           sum.innerHTML=`<b>Summary</b>: ${result.summary.substring(0, 4000)}${result.summary.length > 4000 ? '...' : ''}`;
           
           if (result.topics && result.topics.length > 0) {
-            toast({
-              title: "New Interests Detected",
-              description: `Found: ${result.topics.join(', ')}`,
-            });
-            // Note: In a real app, you would update the user's profile interests here
-            console.log('Detected topics to add to profile:', result.topics);
+            // Process detected topics and identify new ones
+            const newTopics = processDetectedTopics(result.topics);
+            
+            if (newTopics.length > 0) {
+              toast({
+                title: "New Interests Detected!",
+                description: `Found new topics: ${newTopics.join(', ')}. Check your profile to add them!`,
+                duration: 5000,
+              });
+            } else {
+              toast({
+                title: "Topics Detected",
+                description: `Found: ${result.topics.join(', ')} (already in your interests)`,
+              });
+            }
+            
+            console.log('All detected topics:', result.topics);
+            console.log('New topics not in interests:', newTopics);
           }
           
         } catch (error) {
@@ -419,7 +450,7 @@ const Dashboard = () => {
                       </div>
                       
                       <div className="col-span-1 sm:col-span-2">
-                        <p className="text-sm text-gray-500">Interests</p>
+                        <p className="text-sm text-gray-500">Current Interests</p>
                         <div className="flex flex-wrap gap-2 mt-1">
                           {interests && interests.length > 0 ? (
                             interests.map((interest, index) => (
@@ -432,6 +463,31 @@ const Dashboard = () => {
                           )}
                         </div>
                       </div>
+                      
+                      {detectedTopics.length > 0 && (
+                        <div className="col-span-1 sm:col-span-2">
+                          <p className="text-sm text-gray-500">New Topics Detected from PDF</p>
+                          <p className="text-xs text-gray-400 mb-2">Click to add to your interests:</p>
+                          <div className="flex flex-wrap gap-2 mt-1">
+                            {detectedTopics.map((topic, index) => (
+                              <button
+                                key={index}
+                                onClick={() => {
+                                  toast({
+                                    title: "Interest Added!",
+                                    description: `"${topic}" has been noted. In a full app, this would update your profile.`,
+                                  });
+                                  // Remove from detected topics after clicking
+                                  setDetectedTopics(prev => prev.filter(t => t !== topic));
+                                }}
+                                className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs hover:bg-green-200 transition-colors border border-green-300"
+                              >
+                                + {topic}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                       <div className="col-span-1 sm:col-span-2">
                         <h4 className="text-sm font-medium">Add Calendar Event</h4>
                         <div className="mt-2 space-y-2">
