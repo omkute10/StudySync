@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   BookOpen, Users, Upload, Search, Bell, LogOut, MessageSquare,
-  Calendar, User, X, ArrowLeft, Menu
+  Calendar, User, X, ArrowLeft, Menu, Sparkles
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useSignup } from "@/contexts/SignupContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { GeminiChat } from "@/components/GeminiChat";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ const Dashboard = () => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [isMessageOpen, setIsMessageOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const [messageSearchQuery, setMessageSearchQuery] = useState("");
   const [selectedUser, setSelectedUser] = useState<{id: number, name: string, image: string} | null>(null);
   const [showMessageBox, setShowMessageBox] = useState(false);
@@ -155,6 +157,20 @@ const Dashboard = () => {
                 </div>
                 <div className="flex justify-end">
                   <Button onClick={() => setIsCalendarOpen(false)}>Close</Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+            
+            <Dialog open={isChatOpen} onOpenChange={setIsChatOpen}>
+              <DialogTrigger asChild>
+                <a href="#" className="nav-link flex items-center gap-2">
+                  <Sparkles className="w-4 h-4" />
+                  <span>AI Chat</span>
+                </a>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[700px] w-[95vw] max-h-[90vh] p-0">
+                <div className="h-[600px]">
+                  <GeminiChat />
                 </div>
               </DialogContent>
             </Dialog>
