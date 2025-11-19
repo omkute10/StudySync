@@ -1,17 +1,34 @@
-
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Upload, BookOpen, Users, Laptop } from "lucide-react";
 import GlassCard from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
-import { useSignup, Role, StudentType } from "@/contexts/SignupContext";
+import { useSignup } from "@/contexts/SignupContext";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const SignupRole = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { role, setRole, studentType, setStudentType } = useSignup();
+  const { 
+    role, 
+    setRole, 
+    studentType, 
+    setStudentType,
+    // Get all the data collected from previous steps
+    name,
+    age,
+    gender,
+    degree,
+    email,
+    password, // Ensure you have added password to SignupContext as per instructions
+    interests
+  } = useSignup();
+  
+  const { signup } = useAuth(); // Get the signup function from AuthContext
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!role) {
       toast({
         title: "Select a role",
@@ -30,17 +47,41 @@ const SignupRole = () => {
       return;
     }
 
-    toast({
-      title: "Signup complete!",
-      description: "Welcome to StudySync! You're all set.",
-    });
-    
-    // In a real app, this would send the data to the backend
-    // For now we just simulate the signup success
-    console.log("🏆 Built for Hackathon Challenge by Team StudySync");
-    
-    // Navigate to dashboard
-    navigate("/dashboard");
+    setIsLoading(true);
+
+    try {
+      // Prepare the additional user data for Firestore
+      const userData = {
+        name,
+        age,
+        gender,
+        degree,
+        role,
+        studentType: role === "Student" ? studentType : null,
+        interests
+      };
+
+      // Create the user in Firebase Auth and save profile to Firestore
+      await signup(email, password, userData);
+
+      toast({
+        title: "Signup complete!",
+        description: "Welcome to StudySync! You're all set.",
+      });
+      
+      // Navigate to dashboard
+      navigate("/dashboard");
+
+    } catch (error: any) {
+      console.error("Signup Error:", error);
+      toast({
+        title: "Signup failed",
+        description: error.message || "An error occurred during account creation.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -162,8 +203,13 @@ const SignupRole = () => {
               <Button 
                 onClick={handleSubmit}
                 className="bg-primary hover:bg-primary/90 text-white px-8"
+                disabled={isLoading}
               >
-                Complete Signup <ArrowRight className="ml-2 h-4 w-4" />
+                {isLoading ? "Creating Account..." : (
+                  <>
+                    Complete Signup <ArrowRight className="ml-2 h-4 w-4" />
+                  </>
+                )}
               </Button>
             </div>
           </div>

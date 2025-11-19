@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { z } from "zod";
@@ -18,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email"),
@@ -28,6 +28,7 @@ const formSchema = z.object({
 const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { login } = useAuth(); // Get login from context
   const [isLoading, setIsLoading] = useState(false);
   
   const form = useForm<z.infer<typeof formSchema>>({
@@ -39,22 +40,29 @@ const Login = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      // Perform Firebase login
+      await login(values.email, values.password);
       
       toast({
         title: "Welcome back!",
         description: "You've successfully logged in.",
       });
       
-      console.log("🏆 Built for Hackathon Challenge by Team StudySync");
-      
       navigate("/dashboard");
-    }, 1500);
+    } catch (error: any) {
+      console.error("Login Error:", error);
+      toast({
+        title: "Login failed",
+        description: "Invalid email or password. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

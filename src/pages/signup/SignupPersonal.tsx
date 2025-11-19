@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { z } from "zod";
@@ -33,12 +32,21 @@ const formSchema = z.object({
   gender: z.string().min(1, "Please select your gender"),
   degree: z.string().min(1, "Please select your degree"),
   email: z.string().email("Please enter a valid email"),
+  password: z.string().min(6, "Password must be at least 6 characters"), // Added validation
 });
 
 const SignupPersonal = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { name, setName, age, setAge, gender, setGender, degree, setDegree, email, setEmail } = useSignup();
+  // Get password setters from context
+  const { 
+    name, setName, 
+    age, setAge, 
+    gender, setGender, 
+    degree, setDegree, 
+    email, setEmail, 
+    password, setPassword // Added
+  } = useSignup();
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -48,6 +56,7 @@ const SignupPersonal = () => {
       gender: gender || "",
       degree: degree || "",
       email: email || "",
+      password: password || "", // Added default value
     },
   });
 
@@ -57,6 +66,7 @@ const SignupPersonal = () => {
     setGender(values.gender);
     setDegree(values.degree);
     setEmail(values.email);
+    setPassword(values.password); // Store password in context
     
     toast({
       title: "Step 1 completed!",
@@ -102,7 +112,7 @@ const SignupPersonal = () => {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {Array.from({ length: 8 }, (_, i) => i + 18).map((age) => (
+                        {Array.from({ length: 43 }, (_, i) => i + 18).map((age) => (
                           <SelectItem key={age} value={age.toString()}>
                             {age}
                           </SelectItem>
@@ -193,6 +203,21 @@ const SignupPersonal = () => {
                     <FormLabel>Email</FormLabel>
                     <FormControl>
                       <Input type="email" placeholder="you@example.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* New Password Field */}
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="••••••••" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
